@@ -2,6 +2,8 @@ plugins {
     id 'java'
     id "io.freefair.lombok" version "5.1.0"
     id 'org.springframework.boot' version '2.3.3.RELEASE'
+    id 'java-library'
+    id 'jacoco'
 }
 
 repositories {
@@ -16,12 +18,14 @@ dependencies {
     implementation 'org.apache.commons:commons-math3:3.5'
     implementation 'com.h2database:h2:1.4.200'
     implementation 'org.jdbi:jdbi3-core:3.14.1'
+    implementation 'ch.qos.logback:logback-classic:1.2.3'
 //    testImplementation 'org.seleniumhq.selenium:selenium-java:3.141.59'
     testImplementation 'org.springframework.boot:spring-boot-starter-test:2.3.0.RELEASE'
 //    testImplementation 'io.github.bonigarcia:webdrivermanager:3.8.1'
 //    testImplementation 'org.assertj:assertj-core:3.16.1'
     testImplementation 'org.junit.jupiter:junit-jupiter-api:5.6.1'
     testImplementation 'org.junit.jupiter:junit-jupiter-engine:5.6.1'
+    testImplementation 'org.mockito:mockito-core:3.5.13'
 }
 
 group = 'edu.depail.se433'
@@ -29,14 +33,32 @@ version = '0.0.1-SNAPSHOT'
 description = 'shopping-app'
 sourceCompatibility = '11'
 
-def user = 'dwalke30'
+def user = 'kpate164'
 
 bootJar {
     mainClassName = 'edu.depaul.se433.shoppingapp.ShoppingAppApplication'
 }
 
-def test = tasks.named("test") {
+test {
+    finalizedBy jacocoTestReport
+}
 
+jacocoTestReport {
+    dependsOn test
+}
+
+jacocoTestCoverageVerification {
+    violationRules {
+        rule {
+            limit {
+                minimum = 0.8
+            }
+        }
+    }
+}
+
+def test = tasks.named("test") {
+    ignoreFailures(true)
     useJUnitPlatform ()
 
     afterTest { desc, result ->
@@ -61,7 +83,13 @@ task packageDistribution(type: Zip) {
 }
 
 check {
-    finalizedBy packageDistribution
+    finalizedBy {
+        jacocoTestReport
+        packageDistribution
+    }
+    dependsOn {
+        jacocoTestCoverageVerification
+    }
 }
 
 
