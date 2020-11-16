@@ -16,7 +16,7 @@ import javax.persistence.Entity;
  * contains a quantity value, therefore the total value of this item is
  * a calculation.
  */
-class PurchaseItem {
+public class PurchaseItem { //I made this public
 
   private Long id;
   private String name;
@@ -50,7 +50,7 @@ class PurchaseItem {
 
   private PurchaseItem() {}
 
-  PurchaseItem(String name, double unitPrice, int quantity) {
+  public PurchaseItem(String name, double unitPrice, int quantity) { //I made this public
     this.name = name;
     this.unitPrice = unitPrice;
     this.quantity = quantity;
